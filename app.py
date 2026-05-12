@@ -61,7 +61,9 @@ def save_new_cost(user_id, usage):
 def main():
     init_db()
     st.title("お悩み相談アプリ - Lito")
-
+    
+    if "lito_answer" not in st.session_state:
+        st.session_state["lito_answer"] = ""
     # サイドバーで認証とコスト表示
     with st.sidebar:
         st.subheader("🔑 認証")
@@ -96,7 +98,8 @@ def main():
         "人間関係": "あなたは熟練した人間関係の専門家です。",
         "その他": "あなたは親身な相談員です。"
     }
-
+    if "lito_answer" not in st.session_state:
+        st.session_state["lito_answer"] = ""
     user_input = st.text_input("質問を入力してください：")
     if st.button("送信") and user_input:
         if not is_allowed_before_api(user_id, limit):
@@ -120,15 +123,18 @@ def main():
                     save_new_cost(user_id, response.usage)
                     
                     # 4. 回答を画面に表示！
-                    st.subheader(f"【{worries_type}アドバイザーからの回答】")
-                    answer = response.choices[0].message.content # 中身を取り出す
-                    st.write(answer)
+                    # 2. 回答を「記憶の箱」に覚えさせる！（ここが重要）
+                    st.session_state["lito_answer"] = response.choices[0].message.content
                     
-                    # 回答を保持するためにSession Stateにメモ（リセット対策）
-                    st.session_state["lito_answer"] = answer
-                    
+                    # 金額表示を更新するために再起動（これでも箱の中身は消えない！）
+                    st.rerun() 
                 except Exception as e:
-                    st.error(f"エラーが発生しました: {e}")
+                    st.error(f"エラー: {e}")
 
+    # 3. ボタンの外（一番左のインデント）で、箱の中身を表示する！
+    if st.session_state["lito_answer"]:
+        st.subheader(f"【{worries_type}からの回答】")
+        st.write(st.session_state["lito_answer"])
+                    
 if __name__ == "__main__":
-    main()
+    main()    
