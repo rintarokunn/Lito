@@ -99,31 +99,36 @@ def main():
 
     user_input = st.text_input("質問を入力してください：")
     if st.button("送信") and user_input:
-        st.write("デバッグ：ボタンが押されました！") 
         if not is_allowed_before_api(user_id, limit):
-            st.error("デバッグ：金額制限で止まりました")
             st.error("本日の予算を超えました。また明日相談してくださいね。")
-            return
-
-        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        with st.spinner("回答を生成中..."):
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": prompts[worries_type]},
-                        {"role": "user", "content": user_input}
-                    ]
-                )
-                # 金額を保存
-                save_new_cost(user_id, response.usage)
-                
-                st.subheader(f"【{worries_type}アドバイザーからの回答】")
-                st.write(response.choices[0].message.content)
-                # 金額表示を更新するために再描画（オプション）
-                st.rerun()
-            except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
+        else:
+            # 1. クライアントを初期化（ここでLLMを準備！）
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            
+            with st.spinner("回答を生成中..."):
+                try:
+                    # 2. ここでLLMに「お願い」をする（response = ...）
+                    response = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[
+                            {"role": "system", "content": prompts[worries_type]},
+                            {"role": "user", "content": user_input}
+                        ]
+                    )
+                    
+                    # 3. 消費金額をDBに記録
+                    save_new_cost(user_id, response.usage)
+                    
+                    # 4. 回答を画面に表示！
+                    st.subheader(f"【{worries_type}アドバイザーからの回答】")
+                    answer = response.choices[0].message.content # 中身を取り出す
+                    st.write(answer)
+                    
+                    # 回答を保持するためにSession Stateにメモ（リセット対策）
+                    st.session_state["lito_answer"] = answer
+                    
+                except Exception as e:
+                    st.error(f"エラーが発生しました: {e}")
 
 if __name__ == "__main__":
     main()
