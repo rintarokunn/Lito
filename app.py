@@ -12,7 +12,7 @@ from datetime import datetime
 
 
 def get_db_connection():
-    conn = sqlite3.connect('storywaver.db', check_same_thread=False)
+    conn = sqlite3.connect('lito.db', check_same_thread=False)
     return conn
 
 #データベースとつなげるための関数をていぎします。これで、データベースにアクセスするためのコードを簡単に再利用できるようになります。
@@ -95,7 +95,6 @@ def get_db_cost():
     conn = get_db_connection()
     c = conn.cursor()
     
-    # 【ここを考えて！】
     # api_usageテーブルから、dateがtodayと一致するtotal_costを1つ取ってくる命令
     c.execute("SELECT total_cost FROM api_usage WHERE date = ?", (today,))
     
@@ -106,7 +105,7 @@ def get_db_cost():
     return result[0] if result else 0.0
 
 #------------------------------------------ # OpenAI UI # -----------------------------------------
-
+init_db()
 with st.sidebar:
     st.subheader("🔑 認証")
     input_key = st.text_input("合言葉を入力してください", type="password")
