@@ -11,15 +11,23 @@ from openai import OpenAI
 from datetime import datetime
 
 
+def get_db_connection():
+    conn = sqlite3.connect('storywaver.db', check_same_thread=False)
+    return conn
 
 #データベースとつなげるための関数をていぎします。これで、データベースにアクセスするためのコードを簡単に再利用できるようになります。
-def get_db_connection(): 
-#SQLを使ってデータベースに接続します。ストーリウェーバーという名前のノートを指定。
-#プログラムが一度にこなす仕事の並びを、スレッドという。スレッドは、同時に複数の仕事をこなすことができますが、SQLiteは同時に複数のスレッドからアクセスすることができません。check_same_thread=Falseを指定することで、複数のスレッドから同じデータベース接続を使用できるようになります。    
-#Falseにすることで、同じスレッドかどうかのチェックをしない。専門職がチェックして、資格持ってないですと言うのではなく、一般の人が交代でノートに書き込めるイメージです。
-    conn = sqlite3.connect('storywaver.db', check_same_thread=False) 
-#上記でつながったパイプをそとに出すためのコードです。これで、他の関数からもこのデータベースにアクセスできるようになります。
-    return conn 
+def init_db():
+    conn = sqlite3.connect("lito.db", check_same_thread=False)
+    c = conn.cursor()
+    # ここに「api_usage」テーブルを作る命令を足す！
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS api_usage (
+            date TEXT PRIMARY KEY,
+            total_cost REAL DEFAULT 0.0
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 # gpt-4o-miniの現在の料金（2026年時点の最新価格をご確認ください）
 # ※ここでは例として、入力$0.15/1M, 出力$0.60/1Mトークンで計算
