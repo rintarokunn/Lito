@@ -99,7 +99,9 @@ def main():
 
     user_input = st.text_input("質問を入力してください：")
     if st.button("送信") and user_input:
+        st.write("デバッグ：ボタンが押されました！") 
         if not is_allowed_before_api(user_id, limit):
+            st.error("デバッグ：金額制限で止まりました")
             st.error("本日の予算を超えました。また明日相談してくださいね。")
             return
 
