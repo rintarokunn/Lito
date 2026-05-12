@@ -106,34 +106,6 @@ def get_db_cost():
 
 #------------------------------------------ # OpenAI UI # -----------------------------------------
 
-with st.sidebar:
-    st.subheader("🔑 認証")
-    input_key = st.text_input("合言葉を入力してください", type="password")
-    st.header("💰 コスト管理")
-    limit = 0.5
-    
-    # メトリック（数字）で表示
-    st.metric("本日の利用額", f"${current_cost:.4f}", delta=f"上限まで残り ${limit - current_cost:.4f}")
-    
-    # プログレスバーで視覚的に表示
-    percent = min(current_cost / limit, 1.0)
-    st.progress(percent)
-    
-    if current_cost >= limit:
-        st.error("⚠️ 本日の上限に達しました")
-
-# 合言葉が合っているかチェック
-is_admin = (input_key == st.secrets["ADMIN_PASSWORD"])
-
-# 合言葉が合っていれば管理者モード、そうでなければ一般ユーザーモード
-if is_admin:
-    st.sidebar.success("管理者モードでログイン中")
-    user_id = "my_name"  # これでAPI制限をパス！
-else:
-    st.sidebar.info("一般ユーザーモード")
-    user_id = "guest"    # こっちは制限がかかる！
-
-
 # OpenAIクライアント初期化
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
@@ -147,7 +119,36 @@ def main():
     st.title("お悩み相談アプリ - Lito")
     
     current_cost = get_db_cost()
-    # ラジオボタンで専門家を選択
+    
+    with st.sidebar:
+        st.subheader("🔑 認証")
+        input_key = st.text_input("合言葉を入力してください", type="password")
+# 合言葉が合っているかチェック
+        
+        is_admin = (input_key == st.secrets["ADMIN_PASSWORD"])
+        
+# 合言葉が合っていれば管理者モード、そうでなければ一般ユーザーモード
+        if is_admin:
+            st.sidebar.success("管理者モードでログイン中")
+            user_id = "my_name"  # これでAPI制限をパス！
+        else:
+            st.sidebar.info("一般ユーザーモード")
+            user_id = "guest"    # こっちは制限がかかる！
+
+        st.header("💰 コスト管理")
+        limit = 0.5
+    
+# メトリック（数字）で表示
+    st.metric("本日の利用額", f"${current_cost:.4f}", delta=f"上限まで残り ${limit - current_cost:.4f}")
+    
+# プログレスバーで視覚的に表示
+    percent = min(current_cost / limit, 1.0)
+    st.progress(percent)
+    
+    if current_cost >= limit:
+        st.error("⚠️ 本日の上限に達しました")
+
+# ラジオボタンで専門家を選択
     worries_type = st.radio(
         "今あなたが抱えている悩みを教えてください:",
         ("健康", "心理", "仕事", "人間関係", "その他")
