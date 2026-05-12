@@ -110,7 +110,6 @@ with st.sidebar:
     st.subheader("🔑 認証")
     input_key = st.text_input("合言葉を入力してください", type="password")
     st.header("💰 コスト管理")
-    current_cost = get_db_cost() # さっき作った金庫から取る関数！
     limit = 0.5
     
     # メトリック（数字）で表示
