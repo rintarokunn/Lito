@@ -105,7 +105,7 @@ def get_db_cost():
     return result[0] if result else 0.0
 
 #------------------------------------------ # OpenAI UI # -----------------------------------------
-init_db()
+
 with st.sidebar:
     st.subheader("🔑 認証")
     input_key = st.text_input("合言葉を入力してください", type="password")
@@ -144,8 +144,10 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 load_dotenv()
 
 def main():
+    init_db()
     st.title("お悩み相談アプリ - Lito")
-
+    
+    current_cost = get_db_cost()
     # ラジオボタンで専門家を選択
     worries_type = st.radio(
         "今あなたが抱えている悩みを教えてください:",
