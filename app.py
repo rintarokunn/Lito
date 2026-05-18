@@ -83,7 +83,7 @@ def main():
         st.session_state["lito_answer"] = ""
     # サイドバーで認証とコスト表示
     with st.sidebar:
-        st.subheader("🔑 認証")
+        st.subheader("🔑 管理者が無制限に使用できる合言葉")
         input_key = st.text_input("合言葉を入力してください", type="password")
         is_admin = (input_key == st.secrets["ADMIN_PASSWORD"])
         
@@ -94,7 +94,7 @@ def main():
             st.info("一般ユーザーモード")
             user_id = "guest"
 
-        st.header("💰 コスト管理")
+        st.header("💰 OpenAI API利用状況")
         current_cost = get_db_cost()
         limit = 0.5
         st.metric("本日の利用額", f"${current_cost:.4f}")
