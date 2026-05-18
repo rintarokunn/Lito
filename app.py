@@ -83,7 +83,7 @@ def main():
         st.session_state["lito_answer"] = ""
     # サイドバーで認証とコスト表示
     with st.sidebar:
-        st.subheader("🔑 管理者が無制限に使用できる合言葉")
+        st.subheader("🔑 無制限に使用できるようになる合言葉")
         input_key = st.text_input("合言葉を入力してください", type="password")
         is_admin = (input_key == st.secrets["ADMIN_PASSWORD"])
         
